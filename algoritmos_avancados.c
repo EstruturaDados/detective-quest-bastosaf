@@ -1,11 +1,109 @@
+// ============================================================================
+//         PROJETO DETECTIVE QUEST - DESAFIO DE CÓDIGO 
+// ============================================================================
+
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-// Desafio Detective Quest
-// Tema 4 - Árvores e Tabela Hash
-// Este código inicial serve como base para o desenvolvimento das estruturas de navegação, pistas e suspeitos.
-// Use as instruções de cada região para desenvolver o sistema completo com árvore binária, árvore de busca e tabela hash.
 
-int main() {
+/* Estrutura para cada sala da mansão */
+typedef struct No {
+    char nome[50];
+    struct No* esquerda;
+    struct No* direita;
+} No;
+
+/* Cria dinamicamente uma sala com um nome */
+No* criarSala(const char* valor) {
+    No* novo = (No*) malloc(sizeof(No));
+    if (novo == NULL) {
+        printf("Erro ao alocar memória!\n");
+        exit(1);
+    }
+    strcpy(novo->nome, valor);
+    novo->esquerda = NULL;
+    novo->direita = NULL;
+    return novo;
+}
+
+/* Permite explorar interativamente a mansão */
+void explorarSalas(No* atual) {
+    char opcao;
+    char visitadas[20][50];  /* Armazena até 20 salas visitadas */
+    int contador = 0;
+    int i; /* variável do loop declarada fora do for */
+
+    while (atual != NULL) {
+        printf("\nVocê está em: %s\n", atual->nome);
+        strcpy(visitadas[contador], atual->nome);
+        contador++;
+
+        if (atual->esquerda == NULL && atual->direita == NULL) {
+            printf("Fim do caminho! Não há mais saídas.\n");
+            break;
+        }
+
+        printf("Escolha o caminho (e = esquerda, d = direita, s = sair): ");
+        scanf(" %c", &opcao);
+
+        if (opcao == 'e') {
+            if (atual->esquerda != NULL) {
+                atual = atual->esquerda;
+            } else {
+                printf("Não há sala à esquerda!\n");
+            }
+        } else if (opcao == 'd') {
+            if (atual->direita != NULL) {
+                atual = atual->direita;
+            } else {
+                printf("Não há sala à direita!\n");
+            }
+        } else if (opcao == 's') {
+            printf("Saindo da exploração...\n");
+            break;
+        } else {
+            printf("Opção inválida! Tente novamente.\n");
+        }
+    }
+
+    /* Exibe todas as salas visitadas */
+    printf("\n=== Salas visitadas ===\n");
+    for (i = 0; i < contador; i++) {
+        printf("- %s\n", visitadas[i]);
+    }
+}
+
+/* Libera toda a memória da árvore */
+void liberar(No* raiz) {
+    if (raiz != NULL) {
+        liberar(raiz->esquerda);
+        liberar(raiz->direita);
+        free(raiz);
+    }
+}
+
+int main(void) {
+    /* Construção fixa da árvore (mapa da mansão) */
+    No* raiz = criarSala("Hall de Entrada");
+    raiz->esquerda = criarSala("Sala de Estar");
+    raiz->direita = criarSala("Biblioteca");
+
+    raiz->esquerda->esquerda = criarSala("Cozinha");
+    raiz->esquerda->direita = criarSala("Sala de Jantar");
+
+    raiz->direita->esquerda = criarSala("Escritório");
+    raiz->direita->direita = criarSala("Jardim de Inverno");
+
+    printf("=== Bem-vindo à Mansão Misteriosa ===\n");
+    explorarSalas(raiz);
+
+    liberar(raiz);
+    return 0;
+}
+
+// int main() {
 
     // 🌱 Nível Novato: Mapa da Mansão com Árvore Binária
     //
@@ -42,6 +140,6 @@ int main() {
     // - Em caso de colisão, use lista encadeada para tratar.
     // - Modularize com funções como inicializarHash(), buscarSuspeito(), listarAssociacoes().
 
-    return 0;
-}
+//     return 0;
+// }
 
